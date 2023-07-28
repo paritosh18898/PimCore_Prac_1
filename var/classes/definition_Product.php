@@ -19,7 +19,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'title' => '',
    'description' => '',
    'creationDate' => NULL,
-   'modificationDate' => 1689056305,
+   'modificationDate' => 1690528812,
    'userOwner' => 2,
    'userModification' => 2,
    'parentClass' => '',
@@ -67,7 +67,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'name' => 'name',
              'title' => 'name',
              'tooltip' => '',
-             'mandatory' => false,
+             'mandatory' => true,
              'noteditable' => false,
              'index' => 0,
              'locked' => false,
@@ -97,7 +97,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'name' => 'image',
              'title' => 'Image',
              'tooltip' => '',
-             'mandatory' => false,
+             'mandatory' => true,
              'noteditable' => false,
              'index' => 0,
              'locked' => false,
@@ -120,7 +120,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'name' => 'color',
              'title' => 'color',
              'tooltip' => '',
-             'mandatory' => false,
+             'mandatory' => true,
              'noteditable' => false,
              'index' => 0,
              'locked' => false,
@@ -157,7 +157,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
                 'value' => 'orange',
               ),
             ),
-             'maxItems' => NULL,
+             'maxItems' => 2,
              'renderType' => 'list',
              'optionsProviderClass' => '',
              'optionsProviderData' => '',
@@ -186,13 +186,17 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
             ),
              'classes' => 
             array (
+              0 => 
+              array (
+                'classes' => 'Category',
+              ),
             ),
              'displayMode' => 'grid',
              'pathFormatterClass' => '',
              'assetInlineDownloadAllowed' => false,
              'assetUploadPath' => '',
              'allowToClearRelation' => true,
-             'objectsAllowed' => false,
+             'objectsAllowed' => true,
              'assetsAllowed' => false,
              'assetTypes' => 
             array (
@@ -209,7 +213,7 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
              'title' => 'Workflow State',
              'tooltip' => '',
              'mandatory' => false,
-             'noteditable' => false,
+             'noteditable' => true,
              'index' => 0,
              'locked' => false,
              'style' => '',
@@ -290,44 +294,6 @@ return \Pimcore\Model\DataObject\ClassDefinition::__set_state(array(
    'enableGridLocking' => false,
    'deletedDataComponents' => 
   array (
-    0 => 
-    \Pimcore\Model\DataObject\ClassDefinition\Data\ManyToOneRelation::__set_state(array(
-       'name' => 'Category',
-       'title' => 'Category',
-       'tooltip' => '',
-       'mandatory' => false,
-       'noteditable' => false,
-       'index' => 0,
-       'locked' => false,
-       'style' => '',
-       'permissions' => NULL,
-       'fieldtype' => '',
-       'relationType' => true,
-       'invisible' => false,
-       'visibleGridView' => false,
-       'visibleSearch' => false,
-       'blockedVarsForExport' => 
-      array (
-      ),
-       'classes' => 
-      array (
-      ),
-       'displayMode' => 'grid',
-       'pathFormatterClass' => '',
-       'assetInlineDownloadAllowed' => false,
-       'assetUploadPath' => '',
-       'allowToClearRelation' => true,
-       'objectsAllowed' => false,
-       'assetsAllowed' => false,
-       'assetTypes' => 
-      array (
-      ),
-       'documentsAllowed' => false,
-       'documentTypes' => 
-      array (
-      ),
-       'width' => '',
-    )),
   ),
    'blockedVarsForExport' => 
   array (

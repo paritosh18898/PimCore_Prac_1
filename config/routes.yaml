@@ -4,4 +4,45 @@ _pimcore:
 app:
     resource: "../src/Controller/"
     type: annotation
-    
+
+object_list:
+    path: /listAction
+    controller: App\Controller\ProductController::listAction
+
+add_object:
+    path: /add
+    controller: App\Controller\ProductController::add
+
+add_product:
+    path: /create
+    controller: App\Controller\ProductController::create
+
+update_object:
+    path: /update
+    controller: App\Controller\ProductController::update
+
+object_delete:
+    path: /delete
+    controller: App\Controller\ProductController::delete
+
+object_view:
+    path: /viewAction
+    controller: App\Controller\ProductController::viewAction
+
+get_product_data:
+    path: /get_product_data
+    controller: App\Controller\ProductController::getProductDataAction
+    methods: [GET]
+
+productUnpublish:
+    path: /unpublish
+    controller: App\Controller\ProductController::unPublishprodcutAction
+    methods: [GET]
+
+view_product:
+    path: /view_product/{id}
+    controller: App\Controller\ProductController::viewProduct
+    methods: ['GET']
+
+
+

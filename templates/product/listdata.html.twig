@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <div style="text-align: center;">
+        <img src="/bundles/pimcoreadmin/img/logo-claim-gray.svg" alt="Logo claim grey" style="width: 400px;">
+    </div>
+    <br/><br/>
+    <h2 style="text-align: center;">Product List</h2>
+    <br/><br/>
+    <table id="assetsTbl" class="display" style="width:100%">
+        <thead>
+        <tr>
+            <th>SNo.</th>
+            <th>ObjectId</th>
+            <th>Product Name</th>
+            <th>Image</th>
+            <th>Color</th>
+            <th>WorkFlowState</th>
+            <th>Category</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in entries %}
+            <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{ entry.id }}</td>
+                <td>{{ entry.Name }}</td>
+                <td><img src="/var/assets/{{ entry.Image ? entry.Image : 'default-product-image.png' }} " width="100px" height="100px"/></td>
+                <td>{{ entry.Color | join(',') }}</td>
+                <td>{{ entry.workFlowState }}</td>
+                <td>{{ entry.category }}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary">
+                        <a href="javascript:void(0);" class="btnOpenModal" style='font-size:14px;color:black' ObjectId="{{ entry.id }}" style="color:black;">Edit Me</a> 
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                        <a href="javascript:void(0);" onClick="deleteProduct(this,'{{ entry.id }}','{{ path('object_delete') }}');"><div class='fas' style='font-size:14px;color:black' title="delete" style="color:black;">Delete</div></a>
+                    </button>
+                    <button type="button" class="btn btn-warning" style='font-size:14px;color:black;' onclick="confirmUnpublish({{ entry.id }})">
+                        Unpublish
+                    </button>
+                   <button type="button" class="btn btn-info" style='font-size:14px;color:black;' onclick="openView({{ entry.id }})">View
+                    </button>
+                </td>
+                <td>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div style="text-align: center;">
+        <a class="btn btn-sm btn-success" style='font-size:14px;color:babypink' href="{{ path('add_object') }}">Add a New Product</a>
+    </div>
+   <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title" id="lableId">Object Details</h4>
+        </div>
+        <div class="modal-body">
+            <form id="formAsset" style=" padding: 1%;" action="" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="ObjectId" id="ObjectId" value="">
+                <br/>
+                <div class="row mb-3">
+                    <label for="name" class="col-sm-2 col-form-label">Product Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="name" name="name" required/>
+                    </div>
+                </div>
+            <div class="row mb-3">
+                <label for="image" class="col-sm-2 col-form-label">Product Image</label>
+                <div class="col-sm-10">
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*" />
+                    <!-- Add an image preview element to show the selected image -->
+                    <div id="imagePreview"></div>
+                </div>
+            </div>
+                <div class="row mb-3">
+                    <label class="control-label col-sm-2" for="color">Product Color:</label>
+                    <div class="col-sm-4">          
+                    <select name="color[]" multiple id="colorOpt"  required>
+                            <option value="blue">Blue</option>
+                            <option value="red">Red</option>
+                            <option value="green">Green</option>
+                            <option value="orange">Orange</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">Submit</button>
+                </div>  
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+{# For value prefilled edit #}
+    $(document).ready(function () {
+        var newsDatatable = $('#assetsTbl').DataTable();
+    });
+    $(".btnOpenModal").click(function(){
+        var ObjectId = $(this).attr("ObjectId");
+        $("#lableId").text("To Modify your data");
+        $('#ObjectId').val(ObjectId);
+        $("#formAsset").attr('action', "{{ path('update_object')}}");
+
+        // Center the text by adding a class to the modal-title
+        $(".modal-title").addClass("text-center");
+
+        // Fetch the existing data for the product using an AJAX request
+        $.ajax({
+            url: "{{ path('get_product_data') }}",
+            type: 'GET',
+            data: { 'ObjectId': ObjectId },
+            dataType: "json",
+            success: function(response) {
+                // Update the form fields with the fetched data
+                $("#name").val(response.name);
+                var colors = response.color;
+                $("#colorOpt").val(colors).multiselect("refresh"); 
+
+                // Pre-fill the image preview
+                if (response.image) {
+                    var imagePreview = $("#imagePreview");
+                    imagePreview.empty();
+                    var img = $("<img>").attr("src", "/var/assets/" + response.image)
+                                        .css("max-width", "100px")
+                                        .css("max-height", "100px");
+                    imagePreview.append(img);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error:", errorThrown);
+                swal("Error!", "An error occurred while fetching product data.", "error");
+            }
+        });
+        $("#myModal").modal('show');
+    });
+
+{# To Delete a Product  #}
+    function deleteProduct(elemObj, ObjectId, url) {
+        var newsDatatableRow = $('#assetsTbl').DataTable().row($(elemObj).parents('tr'));
+        swal({
+            title: "Are you sure?",
+            text: "Are you sure you want to proceed? Once deleted, you will not be able to recover this data!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: { '_method': 'post', 'ObjectId': ObjectId },
+                    dataType: "json",
+                    success: function(responseTxt, textStatus, jqXHR) {
+                        if (responseTxt.status == "success") {
+                            // Show the success message
+                            swal("Deleted!", "Your data has been deleted!", "success");
+                            // Remove the row from the DataTable
+                            newsDatatableRow.remove().draw(false);
+                            // Reload the page after a short delay (optional)
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000); // 1000 milliseconds (1 second)
+                        } else {
+                            swal("Error!", "Failed to delete the product.", "error");
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log("Error:", errorThrown); 
+                        swal("Error!", "An error occurred while deleting the product.", "error");
+                    },
+                });
+            }
+        });
+    }
+
+{# To Unpublish a Product #}
+ function confirmUnpublish(productId) {
+    swal({
+        title: "Are you sure?",
+        text: "Are you sure you want to unpublish this product?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then((willUnpublish) => {
+        if (willUnpublish) {
+            window.location.href = "{{ path('productUnpublish') }}?id=" + productId;
+        }
+    });
+}
+
+{# for viewing product details on a new route-view_product #}
+function openView(productId) {
+    // Redirect to the view_product route with the product ID
+    window.location.href = "{{ path('view_product', {'id': '__productId__'}) }}".replace('__productId__', productId);
+}
+
+</script>
+</body>
+</html>
+{% endblock %}

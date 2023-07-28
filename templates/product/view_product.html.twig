@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <h2>Product Details</h2>
+        <br/><br/>
+    </div>
+    <div>
+        <strong>Name:</strong> {{ product.Name }}<br><br>
+        <strong>Image:</strong> <img src="/var/assets/{{ product.Image ? product.Image : 'default-product-image.png' }}" width="100px" height="100px"><br/><br/>
+        <strong>Color:</strong> {{ product.Color | join(',') }}<br/><br/>
+        <strong>Workflow State:</strong> {{ product.workFlowState }}<br/><br/>
+        <strong>Category:</strong> {{ product.Category }}<br>
+    </div>
+{% endblock %}

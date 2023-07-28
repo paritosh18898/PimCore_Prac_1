@@ -1,92 +1,56 @@
-pimcore:
+pimcore: 
     workflows:
-        Product_workflow:
-            label: 'Product Approval'
-            type: 'state_machine'
-            # support_strategy:
-            #     service: App\Workflow\SupportsStrategy
-
-            marking_store:
-                type: single_state
-                arguments:
-                    - workflowState
-
-            supports:
-                - Pimcore\Model\DataObject\Product
-            initial_markings: ToReview
-            places:
-                ToReview:
-                    # label: 'Waiting for approval'
-                    label: 'In Review'
-                    color: '#FFFFCC'
-                    permissions:
-                        -
-                            condition:   is_fully_authenticated() and 'manager' in role_names
-                            # condition:   is_fully_authenticated() and 'ROLE_PIMCORE_ADMIN' in role_names
-                            publish: true
-                            delete: true
-                        -
-                            condition:   is_fully_authenticated() and 'employee' in role_names
-                            publish: false
-                            delete: false
-                            view: true
-                ProductRejected:
-                    label: 'Product Rejected'
-                    color: '#D83A56'
-                    permissions:
-                        -
-                            condition:   is_fully_authenticated() and 'manager' in role_names
-                            publish: true
-                            delete: true
-                        -
-                            condition:   is_fully_authenticated() and 'employee' in role_names
-                            publish: false
-                            delete: false
-                            view: false
-                ProductAccepted:
-                    label: 'Product Accepted'
-                    color: '#66DE93'
-                    permissions:
-                        -
-                            condition:   is_fully_authenticated() and 'manager' in role_names
-                            # condition:   is_fully_authenticated() and 'ROLE_PIMCORE_ADMIN' in role_names
-                            publish: true
-                            delete: true
-                        -
-                            condition:   is_fully_authenticated() and 'employee' in role_names
-                            publish: false
-                            delete: false
-                            view: true
-            transitions:
-                approval_accepted:
-                    from: ToReview
-                    to: ProductAccepted
-                    guard: "is_granted ('ROLE_PIMCORE_ADMIN') or is_granted ('ROLE_MANAGER')"
-                    options:
-                        label: 'Product Approved'
-                        changePublishedState: force_published
-                        notificationSettings:
-                        - notifyUsers: ['admin']
-                          notifyRoles: ['manager']
-                          channelType:
-                                - pimcore_notification
-                approval_rejected:
-                    from: ToReview
-   #  from: toReview
-                    to: ProductRejected
-                    # to: product_rejected
-                    guard: "is_granted ('ROLE_PIMCORE_ADMIN') or is_granted ('ROLE_MANAGER')"
-                    options:
-                        label: 'Product Rejected'
-                        changePublishedState: force_unpublished
-                        notificationSettings:
-                        - notifyUsers: ['admin']
-                          notifyRoles: ['manager']
-                          channelType:
-                                - pimcore_notification
-                reset_product:
-                    from: [ProductAccepted,ProductRejected]
-                    to: ToReview
-                    options:
-                        label: 'Product Reset'
-                        changePublishedState: force_unpublished
+      product_workflow:
+        label: 'Product Workflow'
+        type: workflow
+        supports:
+          - Pimcore\Model\DataObject\Product
+        initial_markings: created
+        places:
+          created:
+            label: 'Created'
+            color: '#377ea9'
+            permissions:
+              -   condition: "is_fully_authenticated() and 'ROLE_EMPLOYEE' or 'ROLE_ADMIN' in role_names"
+              -   publish: false
+              -   unpublish: true
+          Approval:
+            label: 'Approval'
+            color: '#0C2AAC'
+            permissions:
+              -   condition: "is_fully_authenticated() and 'ROLE_EMPLOYEE' or 'ROLE_ADMIN' in role_names"
+              -   publish: false
+              -   unpublish: true
+          Approved:
+            label: 'Approved'
+            color: '#28a013'
+            permissions:
+              -   condition: "is_fully_authenticated() and 'ROLE_MANAGER' in role_names"
+              -   publish: true
+              -   unpublish: false
+          Rejected:
+            label: 'Rejected'
+            color: '#d41111'
+            permissions:
+              -   condition: "is_fully_authenticated() and 'ROLE_MANAGER' in role_names"
+              -   publish: false
+              -   unpublish: true
+        transitions:
+          Approve:
+            from: created
+            to: Approval
+            guard: "is_granted ('ROLE_EMPLOYEE')  or ('ROLE_ADMIN')"
+            options:
+              label: 'For Approval'
+          Approved:
+            from: Approval
+            to: Approved
+            guard: "is_granted ('ROLE_MANAGER')"
+            options:
+              label: 'Approved'
+          Reject:
+            from: Approval
+            to: Rejected
+            guard: "is_granted ('ROLE_MANAGER')"
+            options:
+              label: 'Rejected'
